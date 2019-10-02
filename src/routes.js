@@ -1,16 +1,36 @@
 import React from "react";
 
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+
+import { isAuthenticated } from "./auth";
+
+import Login from "./pages/Login";
+
+import ListRepos from "./pages/ListRepos";
+
+import RepoDetail from "./pages/RepoDetail";
+
+const PrivateRoute = ({ component: Component, ...rest }) => (
+	<Route
+			{...rest}
+			render={props =>
+				isAuthenticated() ? (
+					<Component {...props} />
+				) : (
+					<Redirect to={{ pathname: "/", state: { from: props.location } }} />
+				)
+			}
+	/>
+);
 
 const Routes = () => (
-    <BrowserRouter>
-        <Switch>
-        <Route exact path="/" component={() => <h1>Hello</h1>} />
-        <Route exact path="/repos" component={() => <h1>Repos</h1>} />
-        <Route path="/repos/:name/details" 
-            component={() => <h1>Repo Detail</h1>} />
-        </Switch>
-    </BrowserRouter>
+	<BrowserRouter>
+		<Switch>
+		<Route exact path="/" component={Login} />
+		<PrivateRoute exact path= "/repos" component={ListRepos} />
+		<PrivateRoute path= "/repos/:name/details" component={RepoDetail} />
+		</Switch>
+	</BrowserRouter>
 );
 
 export default Routes;
